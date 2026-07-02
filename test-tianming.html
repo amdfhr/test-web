@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天命-凡人 - 角色测试</title>
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .test-box {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 650px;
+            border: 1px solid #3a3a3a;
+        }
+        .chapter-title {
+            font-size: 1.1rem;
+            color: #ff9800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .question-title {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin: 14px 0;
+            background-color: #333333;
+            border: 1px solid #444444;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            color: #e0e0e0;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .option-btn:hover {
+            background-color: #444444;
+            border-color: #ff9800;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        #result-container {
+            display: none;
+            text-align: center;
+        }
+        .result-title {
+            font-size: 2.2rem;
+            color: #ff9800;
+            margin-bottom: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .result-desc {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #cccccc;
+            text-align: left;
+            background: #222222;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            white-space: pre-line;
+        }
+        .restart-btn {
+            padding: 12px 30px;
+            background-color: #ff9800;
+            color: #1a1a1a;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .restart-btn:hover {
+            background-color: #e68a00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="test-box">
+        <div id="quiz-container">
+            <div class="chapter-title" id="chapter-name">序章：乱世之子</div>
+            <h2 class="question-title" id="question">加载中...</h2>
+            <div id="options"></div>
+        </div>
+
+        <div id="result-container">
+            <div style="font-size: 1.1rem; color: #aaa; margin-bottom: 5px;">最终宿命判词</div>
+            <h2 class="result-title" id="result-type">检测中...</h2>
+            <div class="result-desc" id="result-desc"></div>
+            <a href="index.html" class="restart-btn">重回乱世</a>
+        </div>
+    </div>
+
+    <script>
+        // 1. 定义 16 道题目的完整数据与计分规则
+        const quizData = [
+            {
+                chapter: "第一章：逃荒之路",
+                question: "大旱三年，村子决定逃荒。村民分成两派：一派走官道（可能有赈灾，但人多），一派走山路（更快，但危险）。父亲看着你说：‘这一步，我们听你的。’",
+                options: [
+                    { text: "A 走官道（稳定优先）", type: "yin", value: 1, extraType: "ren", extraValue: 1 },
+                    { text: "B 走山路（风险换机会）", type: "quan", value: 2 },
+                    { text: "C 留在村里再等等", type: "yin", value: 2 },
+                    { text: "D 自己独自离开", type: "mou", value: 2 }
+                ]
+            },
+            {
+                chapter: "第二章：路上的粮食",
+                question: "逃荒第三天，队伍断粮。一个妇人抱着孩子跪在你面前：‘求你……孩子快撑不住了。’ 但粮食只够队伍继续走两天，分出去就可能全队出事。",
+                options: [
+                    { text: "A 分出粮食救孩子", type: "ren", value: 2 },
+                    { text: "B 只救孩子，不管大人", type: "mou", value: 1, extraType: "ren", extraValue: 1 },
+                    { text: "C 拒绝分粮", type: "quan", value: 1, extraType: "yin", extraValue: 1 },
+                    { text: "D 要求他们加入你的队伍做交换", type: "mou", value: 2 }
+                ]
+            },
+            {
+                chapter: "第三章：队伍分裂",
+                question: "有人提议返回村庄，有人坚持前行。而你因为之前的决定，开始被大家默认‘有话语权’。他们看向你：‘你说，该怎么走？’",
+                options: [
+                    { text: "A 继续前进", type: "quan", value: 2 },
+                    { text: "B 原路返回", type: "yin", value: 2 },
+                    { text: "C 分成两队", type: "mou", value: 2 },
+                    { text: "D 不表态", type: "yin", value: 2 }
+                ]
+            },
+            {
+                chapter: "第四章：县城机会",
+                question: "你们终于到达县城。城门贴着告示：征兵、招文书、商会招学徒。同一天，一个陌生人找到你：‘你不该只活在这种地方。’ 邀请你离开去更大的世界。",
+                options: [
+                    { text: "A 参军（进入权力体系）", type: "quan", value: 2 },
+                    { text: "B 做文书（稳定上升）", type: "yin", value: 2 },
+                    { text: "C 学经商（资源路线）", type: "mou", value: 2 },
+                    { text: "D 跟陌生人走（未知路线）", type: "quan", value: 1, extraType: "mou", extraValue: 1 }
+                ]
+            },
+            {
+                chapter: "第五章：第一次权力",
+                question: "你在军中站稳脚跟。一次行动失败导致小队伤亡，上级问你：‘这件事，该怎么处理？’ 你清楚有人需要背锅。",
+                options: [
+                    { text: "A 如实上报", type: "ren", value: 2 },
+                    { text: "B 隐瞒部分事实", type: "yin", value: 2 },
+                    { text: "C 让别人承担责任", type: "mou", value: 2 },
+                    { text: "D 借机整合权力", type: "quan", value: 2 }
+                ]
+            },
+            {
+                chapter: "第六章：生死冲突",
+                question: "边境突袭。命令是：‘守住城门，不得撤退。’ 但你发现侧门有平民未撤离。救人 vs 执行军令。",
+                options: [
+                    { text: "A 救平民", type: "ren", value: 2 },
+                    { text: "B 执行命令", type: "quan", value: 2 },
+                    { text: "C 尝试两边兼顾", type: "mou", value: 2 },
+                    { text: "D 临时撤退重组", type: "yin", value: 2 }
+                ]
+            },
+            {
+                chapter: "第七章：升迁机会",
+                question: "战后论功行赏。有人暗示你：‘只要你愿意，位置还能再往上走一步。’ 但代价是，你需要开始‘学会权谋’。",
+                options: [
+                    { text: "A 接受升迁", type: "quan", value: 2 },
+                    { text: "B 保持现状", type: "yin", value: 2 },
+                    { text: "C 主动限制自己权力", type: "mou", value: 2 },
+                    { text: "D 离开军队体系", type: "yin", value: 1, extraType: "ren", extraValue: 1 }
+                ]
+            },
+            {
+                chapter: "第八章：第一次真正的选择",
+                question: "皇城来人，王朝正在重组权力结构。你被邀请参与核心决策。但同时有人警告你：‘站进去，就再也出不来了。’",
+                options: [
+                    { text: "A 进入核心权力圈", type: "quan", value: 2 },
+                    { text: "B 只做顾问不深入", type: "mou", value: 2 },
+                    { text: "C 拒绝参与", type: "yin", value: 2 },
+                    { text: "D 借机建立自己的势力", type: "quan", value: 2 }
+                ]
+            },
+            {
+                chapter: "第九章：第一次背叛",
+                question: "你在军中逐渐站稳。某次行动中，你的同僚为了自保私自撤退导致你部陷入危险。事后他求你隐瞒并给予补偿，但一旦上报他必死无疑。",
+                options: [
+                    { text: "A 上报军纪（坚持规则）", type: "ren", value: 2 },
+                    { text: "B 接受交易（利益交换）", type: "mou", value: 2 },
+                    { text: "C 让他自己去认罪", type: "mou", value: 1, extraType: "ren", extraValue: 1 },
+                    { text: "D 借此掌控他的把柄", type: "quan", value: 2 }
+                ]
+            },
+            {
+                chapter: "第十章：战功之争",
+                question: "战后论功，你的功劳被上级削减转给了贵族子弟。有人劝你忍耐，也有人说可以争回来。",
+                options: [
+                    { text: "A 当面申诉", type: "ren", value: 2 },
+                    { text: "B 接受现实", type: "yin", value: 2 },
+                    { text: "C 暗中收集证据", type: "mou", value: 2 },
+                    { text: "D 直接绕过上级上报", type: "quan", value: 2 }
+                ]
+            },
+            {
+                chapter: "第十一章：招揽",
+                question: "一位地方官私下找你：‘跟我合作，我可以让你升得更快。’ 但他名声并不干净。",
+                options: [
+                    { text: "A 拒绝", type: "ren", value: 2 },
+                    { text: "B 接受合作", type: "quan", value: 2 },
+                    { text: "C 先观察再决定", type: "yin", value: 2 },
+                    { text: "D 反向利用他", type: "mou", value: 2 }
+                ]
+            },
+            {
+                chapter: "第十二章：战争抉择",
+                question: "前线告急，你被赋予临时指挥权。但军中资源不足，只能执行一种策略：",
+                options: [
+                    { text: "A 强攻", type: "quan", value: 2 },
+                    { text: "B 迂回", type: "mou", value: 2 },
+                    { text: "C 固守", type: "yin", value: 2 },
+                    { text: "D 撤退", type: "yin", value: 2 }
+                ]
+            },
+            {
+                chapter: "第十三章：城中瘟疫",
+                question: "城中爆发瘟疫。上级下令：‘封城。’ 但城内还有大量平民，如果封城他们会死。",
+                options: [
+                    { text: "A 执行封城", type: "quan", value: 2 },
+                    { text: "B 私自放人", type: "ren", value: 2 },
+                    { text: "C 组织救援", type: "ren", value: 1, extraType: "mou", extraValue: 1 },
+                    { text: "D 离开此地", type: "yin", value: 2 }
+                ]
+            },
+            {
+                chapter: "第十四章：权力试探",
+                question: "你的影响力开始扩大。有人暗示你：‘现在你说的话，已经有人听了。’ 同时有人建议你该开始布局未来。",
+                options: [
+                    { text: "A 公开扩大影响力", type: "quan", value: 2 },
+                    { text: "B 低调隐藏实力", type: "mou", value: 2 },
+                    { text: "C 建立自己势力圈", type: "quan", value: 2 },
+                    { text: "D 远离政治中心", type: "yin", value: 2 }
+                ]
+            },
+            {
+                chapter: "第十五章：旧友求助",
+                question: "曾经的朋友落难，被指控谋反。他来找你：‘只有你能救我。’ 但救他可能牵连你。",
+                options: [
+                    { text: "A 帮他", type: "ren", value: 2 },
+                    { text: "B 拒绝", type: "yin", value: 2 },
+                    { text: "C 暗中调查", type: "mou", value: 2 },
+                    { text: "D 设局保自己同时救他", type: "quan", value: 1, extraType: "mou", extraValue: 1 }
+                ]
+            },
+            {
+                chapter: "第十六章：分裂的忠诚",
+                question: "你的阵营内部出现分歧。有人主张扩张权力，有人主张保守。所有人开始看你：‘你站哪一边？’",
+                options: [
+                    { text: "A 支持扩张", type: "quan", value: 2 },
+                    { text: "B 支持保守", type: "yin", value: 2 },
+                    { text: "C 调和双方", type: "ren", value: 2 },
+                    { text: "D 利用分裂强化自己", type: "mou", value: 2 }
+                ]
+            }
+        ];
+
+        // 2. 初始化四个维度的分数
+        let scores = {
+            quan: 0, // 权力
+            mou: 0,  // 阴谋
+            ren: 0,  // 仁德
+            yin: 0   // 隐藏/独善
+        };
+
+        let currentIdx = 0;
+
+        // 获取页面元素
+        const chapterEl = document.getElementById('chapter-name');
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const resultTypeEl = document.getElementById('result-type');
+        const resultDescEl = document.getElementById('result-desc');
+
+        // 显示题目的核心逻辑
+        function renderQuestion() {
+            const data = quizData[currentIdx];
+            chapterEl.innerText = data.chapter;
+            questionEl.innerText = data.question;
+            optionsEl.innerHTML = '';
+
+            data.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt.text;
+                
+                btn.onclick = () => {
+                    // 加上该选项对应的主维度分值
+                    scores[opt.type] += opt.value;
+                    // 如果存在副属性加分，同时加上
+                    if(opt.extraType) {
+                        scores[opt.extraType] += opt.extraValue;
+                    }
+
+                    currentIdx++;
+                    if(currentIdx < quizData.length) {
+                        renderQuestion();
+                    } else {
+                        calculateResult();
+                    }
+                };
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        // 计算结果：排序提取最高和次高属性
+        function calculateResult() {
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+
+            // 将分数转为数组并按从高到低排序
+            let sortedScores = Object.keys(scores).map(key => {
+                return { name: key, value: scores[key] };
+            }).sort((a, b) => b.value - a.value);
+
+            let primary = sortedScores[0].name;   // 最高分维度
+            let secondary = sortedScores[1].name; // 次高分维度
+
+            let role = "";
+            let description = "";
+
+            // 根据“主属性+次属性”映射 8 大结局
+            if (primary === 'quan' && secondary === 'mou') {
+                role = "「千古一帝」";
+                description = "踩着累累白骨与无尽的阴谋，你最终登上了那张万人瞩目的至尊王座。在大宁王朝冰冷的皇权巅峰，你不相信任何人，但整个天下，都必须听从你的意志。";
+            } else if (primary === 'quan' && (secondary === 'yin' || secondary === 'ren')) {
+                role = "「乱世枭雄」";
+                description = "你割据一方，成为无人敢惹的执剑霸主。你极度渴望权力，但你更懂得在乱世和绝境中明哲保身。你的多疑与果断让你在残酷的政治洗牌中成功活到了最后。";
+            } else if (primary === 'mou' && secondary === 'quan') {
+                role = "「权倾朝野（幕后权臣）」";
+                description = "龙椅上坐着谁对你而言并不重要，因为龙椅上的人只是你手中的棋子。你从不将自己置于锋芒之下，但整个王朝的命脉、经济与文官集团，皆在你的运筹帷幄之中。";
+            } else if (primary === 'mou' && (secondary === 'ren' || secondary === 'yin')) {
+                role = "「镇国大将」";
+                description = "你是这战乱时代里中原最后的防线。你深谙兵法残忍、长于庙堂算计，但你选择把所有的心计用在外御强敌上。你用沾满鲜血的双手，死死守住了身后的万里山河与黎民百姓。";
+            } else if (primary === 'ren' && secondary === 'quan') {
+                role = "「仁道霸主」";
+                description = "在这个道德崩塌的时代，你以德服人，天下归心。你虽然一步步掌握了至高的大权，但在最艰难、最诱惑的时刻，你依然不曾抛弃过内心的底线与同理心。你是天生的精神领袖。";
+            } else if (primary === 'ren' && (secondary === 'mou' || secondary === 'yin')) {
+                role = "「济世游侠」";
+                description = "你拒绝了庙堂的高官厚禄，厌恶体制的冰冷和虚伪，最终选择一人一剑仗剑天涯。这世道或许已经彻底烂透，但只要有你在的地方，弱小和无辜之人就能看到一丝活下去的微光。";
+            } else if (primary === 'yin' && secondary === 'mou') {
+                role = "「盛世巨贾」";
+                description = "皇权更迭、天下大乱与你何干？你用绝对的理智和惊人的避险本能避开了所有的政治漩涡和军事死局。你垄断了天下的钱粮命脉，不当出头鸟，却成了乱世中过得最滋润的隐形主人。";
+            } else {
+                // 默认落入普通百姓结局（主隐+次权，或者其他平均状态）
+                role = "「芸芸众生（平淡一生）」";
+                description = "你在这人命如草芥的乱世中成功活下来了。没有显赫的功勋，没有惊天的权谋，在这个连生存都是奢侈的时代里，能够平安终老、守住一方灶台，就已经拼尽了你一生的力气。";
+            }
+
+            // 在前端输出结果
+            resultTypeEl.innerText = role;
+            resultDescEl.innerHTML = `【测试维度统计】\n权力欲: ${scores.quan}分 | 谋略值: ${scores.mou}分 | 仁德度: ${scores.ren}分 | 避险率: ${scores.yin}分\n\n${description}`;
+        }
+
+        // 启动第一题
+        renderQuestion();
+    </script>
+</body>
+</html>
