@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心动轨迹 - 50题金标准恋爱亲密试炼</title>
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            color: #4a5568;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(241, 143, 143, 0.2);
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #fff;
+        }
+        #key-overlay {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .xianyu-box {
+            background: #fff8f8;
+            border: 1px dashed #feb7b7;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .input-key {
+            width: 80%;
+            padding: 14px;
+            font-size: 1.2rem;
+            border: 2px solid #edf2f7;
+            border-radius: 12px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        .input-key:focus {
+            border-color: #ff758c;
+        }
+        .verify-btn {
+            display: inline-block;
+            width: 85%;
+            padding: 14px 0;
+            background: linear-gradient(90deg, #ff758c 0%, #ff7eb3 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 117, 140, 0.3);
+        }
+        .error-tips {
+            color: #e53e3e;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+        }
+        #quiz-panel { display: none; }
+        .progress-bar-container {
+            width: 100%; height: 6px; background: #edf2f7; border-radius: 3px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 2%; background: linear-gradient(90deg, #ff758c 0%, #ff7eb3 100%); transition: width 0.3s ease;
+        }
+        .progress-text { font-size: 0.9rem; color: #a0aec0; text-align: right; margin-bottom: 10px; }
+        .question-text { font-size: 1.3rem; color: #2d3748; line-height: 1.6; margin-bottom: 35px; min-height: 70px; font-weight: 600; }
+        .matrix-btn {
+            display: block; width: 100%; padding: 16px; margin: 12px 0; background: #fff; border: 2px solid #edf2f7;
+            border-radius: 12px; font-size: 1.05rem; color: #4a5568; cursor: pointer; text-align: center; font-weight: 500; transition: all 0.2s ease;
+        }
+        .matrix-btn:hover { border-color: #ff758c; background: #fff5f5; color: #ff758c; transform: translateY(-2px); }
+        #result-panel { display: none; text-align: center; }
+        .score-display {
+            font-size: 5rem; font-weight: 800; background: linear-gradient(90deg, #ff758c 0%, #ff7eb3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0;
+        }
+        .dimension-box { text-align: left; background: #f7fafc; padding: 20px; border-radius: 14px; margin: 20px 0; }
+        .dim-row { margin: 10px 0; }
+        .dim-label { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 4px; }
+        .dim-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .dim-fill { height: 100%; background: #ff758c; }
+        .analysis-text { font-size: 1.05rem; line-height: 1.8; color: #4a5568; text-align: left; white-space: pre-line; border-top: 1px dashed #e2e8f0; padding-top: 15px; }
+        .back-btn {
+            display: inline-block; margin-top: 25px; padding: 14px 35px; background: linear-gradient(90deg, #ff758c 0%, #ff7eb3 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: bold; box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-card">
+        <div id="key-overlay">
+            <h3 style="margin: 0; color: #2d3748; font-size: 1.4rem;">输入解锁密钥开始测试</h3>
+            <p style="color: #718096; margin: 5px 0 20px 0; font-size: 0.95rem;">本测试包含50道金标准题目与五维深度亲密关系报告</p>
+            
+            <div class="xianyu-box">
+                <strong>💡 如何获取解锁密钥？</strong><br>
+                1. 打开<strong>闲鱼APP</strong>搜索并关注我们的服务。<br>
+                2. 购买名为 <strong>“50题恋爱亲密关系测试密钥”</strong> 的商品（仅需 0.99 元）。<br>
+                3. 付款后，系统会<strong>自动发货</strong>将 10 位数卡密发送给您，复制到下方即可解锁。
+            </div>
+            
+            <input type="text" class="input-key" id="secret-key-input" placeholder="请输入10位解锁卡密" maxlength="12">
+            <button class="verify-btn" onclick="verifyXianyuKey()">验证密钥，解锁测试</button>
+            <div class="error-tips" id="err-zone">❌ 密钥不正确，请重新核对（提示：520开头的10位纯数字）</div>
+        </div>
+
+        <div id="quiz-panel">
+            <div class="progress-text" id="progress-txt">第 1 / 50 题</div>
+            <div class="progress-bar-container"><div class="progress-fill" id="bar-fill"></div></div>
+            <div class="question-text" id="q-box">正在加载浪漫题库...</div>
+            
+            <button class="matrix-btn" onclick="handleAnswer(4)">非常符合（+4分）</button>
+            <button class="matrix-btn" onclick="handleAnswer(3)">比较符合（+3分）</button>
+            <button class="matrix-btn" onclick="handleAnswer(2)">稍微符合（+2分）</button>
+            <button class="matrix-btn" onclick="handleAnswer(1)">完全不符（+1分）</button>
+        </div>
+
+        <div id="result-panel">
+            <div style="font-size: 1.2rem; color: #718096; font-weight: 600;">你们的综合好感度指数</div>
+            <div class="score-display" id="total-score-view">0%</div>
+            
+            <div class="dimension-box">
+                <h4 style="margin: 0 0 15px 0; color: #2d3748;">亲密关系五维雷达图数据</h4>
+                <div id="dim-zone"></div>
+            </div>
+
+            <div class="analysis-text" id="analysis-zone"></div>
+            <a href="index.html" class="back-btn">返回主页</a>
+        </div>
+    </div>
+
+    <script src="lianai-questions.js"></script>
+    <script>
+        let dimScores = { chire: 0, moqi: 0, yilian: 0, baorong: 0, xianshi: 0 };
+        let currentStep = 0;
+
+        const keyOverlay = document.getElementById('key-overlay');
+        const quizPanel = document.getElementById('quiz-panel');
+        const resultPanel = document.getElementById('result-panel');
+        const errZone = document.getElementById('err-zone');
+
+        // 卡密算法校验
+        function verifyXianyuKey() {
+            const inputVal = document.getElementById('secret-key-input').value.trim();
+            const isInputValid = /^520\d{7}$/.test(inputVal); // 必须以 520 开头，后面跟 7 位数字
+
+            if (isInputValid) {
+                keyOverlay.style.display = 'none';
+                quizPanel.style.display = 'block';
+                loadQuestion();
+            } else {
+                errZone.style.display = 'block';
+            }
+        }
+
+        // 加载外部 JS 数组中的题目
+        function loadQuestion() {
+            if (typeof loveQuizData !== 'undefined' && currentStep < loveQuizData.length) {
+                const currentData = loveQuizData[currentStep];
+                document.getElementById('q-box').innerText = currentData.q;
+                document.getElementById('progress-txt').innerText = `第 ${currentStep + 1} / ${loveQuizData.length} 题`;
+                document.getElementById('bar-fill').style.width = `${((currentStep + 1) / loveQuizData.length) * 100}%`;
+            }
+        }
+
+        // 计分处理
+        function handleAnswer(points) {
+            const currentData = loveQuizData[currentStep];
+            dimScores[currentData.type] += points;
+            currentStep++;
+            if (currentStep < loveQuizData.length) { 
+                loadQuestion(); 
+            } else { 
+                renderLoveResult(); 
+            }
+        }
+
+        // 渲染完整结局（已修复小于35不显示的问题）
+        function renderLoveResult() {
+            quizPanel.style.display = 'none';
+            resultPanel.style.display = 'block';
+            
+            let totalEarned = Object.values(dimScores).reduce((a, b) => a + b, 0);
+            let lovePercentage = Math.round(((totalEarned - 50) / 150) * 100);
+            if(lovePercentage < 0) lovePercentage = 0;
+
+            document.getElementById('total-score-view').innerText = lovePercentage + "%";
+            const dimNames = { chire: "炽热指数 (激情)", moqi: "默契指数 (共鸣)", yilian: "依恋指数 (安全)", baorong: "包容指数 (磨合)", xianshi: "现实指数 (未来)" };
+            const dimZone = document.getElementById('dim-zone');
+            dimZone.innerHTML = '';
+
+            Object.keys(dimScores).forEach(key => {
+                let pct = Math.round(((dimScores[key] - 10) / 30) * 100);
+                if(pct < 0) pct = 0;
+                dimZone.innerHTML += `<div class="dim-row"><div class="dim-label"><span>${dimNames[key]}</span><span>${pct}%</span></div><div class="dim-bar"><div class="dim-fill" style="width: ${pct}%"></div></div></div>`;
+            });
+
+            let text = "";
+            if (lovePercentage >= 85) {
+                text = "【好感度>85 宿命契合：灵魂共振的至臻爱恋】\n你们的亲密关系正处于极度健康的黄金期。不仅在多巴胺分泌（激情）上表现优异，更在未来的现实规划和底线包容上达成了惊人的共识。请毫无保留地走下去！";
+            } else if (lovePercentage >= 60) {
+                text = "【好感度>60 双向奔赴：正在升温的舒适关系】\n你们对彼此有着极其明确的好感和依赖。在相处时充满了欢声笑语，但在涉及更长远的未来规划或者某些细小的缺点磨合上，依然留有共同探索的空间。";
+            } else if (lovePercentage >= 35) {
+                text = "【好感度>35 情感拉扯：迷雾中的羁绊磨合】\n你们之间存在着火花，但同时也伴随着较强的试探与不确定性。当前阶段需要更多的坦诚布公，而非内耗式的互相猜测。";
+            } else {
+                text = "【好感度<35 相望江湖：平行线的错位交织】\n测试结果显示，你们当前的情感交集相对疏离。或许你们更适合作为彼此生命中的旁观者、知己或普通朋友。不必因此沮丧，理智地认清彼此的底层需求差异，本身就是一种极具成熟度的情感智慧。";
+            }
+            document.getElementById('analysis-zone').innerText = text;
+        }
+    </script>
+</body>
+</html>
+
