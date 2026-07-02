@@ -1,53 +1,271 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>人格测试系统</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsychoMetric - 专业人格测试与潜能评估平台</title>
+    <style>
+        /* 现代高级色彩与字体现置 */
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent-color: #3b82f6;
+            --accent-hover: #1d4ed8;
+            --border-radius: 16px;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        /* 导航栏 */
+        nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        nav .logo span {
+            color: var(--accent-color);
+        }
+
+        /* 头部欢迎区 */
+        header {
+            max-width: 1200px;
+            margin: 3rem auto 2rem auto;
+            padding: 0 2rem;
+            text-align: left;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* 核心：瀑布流容器布局 */
+        .waterfall-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            /* 关键属性：分为3列 */
+            column-count: 3;
+            column-gap: 24px;
+        }
+
+        /* 剧本卡片样式 */
+        .script-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            break-inside: avoid; /* 防止卡片在分页或多列中被截断 */
+            overflow: hidden;
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block; /* 保证现代浏览器兼容性 */
+            width: 100%;
+        }
+
+        .script-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: #cbd5e1;
+        }
+
+        /* 剧本封面图占位 */
+        .script-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #e2e8f0;
+            object-fit: cover;
+        }
+
+        /* 卡片内容区域 */
+        .script-content {
+            padding: 1.5rem;
+        }
+
+        .script-tag {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--accent-color);
+            padding: 0.25rem 0.7rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .script-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .script-intro {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            text-align: justify;
+        }
+
+        /* 按钮与价格/付费信息 */
+        .script-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1rem;
+        }
+
+        .price-tag {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ef4444;
+        }
+
+        .price-tag span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: normal;
+        }
+
+        .start-btn {
+            background-color: var(--text-primary);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .start-btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        /* 响应式媒体查询：适配平板与手机屏幕 */
+        @media (max-width: 968px) {
+            .waterfall-container {
+                column-count: 2; /* 平板端变为2列 */
+            }
+            header h1 { font-size: 2rem; }
+        }
+
+        @media (max-width: 640px) {
+            .waterfall-container {
+                column-count: 1; /* 手机端变为单列 */
+                padding: 0 1rem;
+            }
+            header { padding: 0 1rem; margin-top: 2rem; }
+        }
+    </style>
 </head>
-<body style="font-family: Arial; padding: 40px;">
-  <h1>🧠 人格测试系统</h1>
-  
-  <div id="setup">
-    <p>选择测试：</p>
-    <select id="scriptSelect">
-      <option value="personality">性格测试</option>
-      <option value="career">职业测试</option>
-    </select>
-    <button onclick="loadScript()">开始测试</button>
-  </div>
+<body>
 
-  <div id="test" style="margin-top: 20px;"></div>
+    <nav>
+        <div class="logo">Psycho<span>Metric</span></div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">专业心理测量方案</div>
+    </nav>
 
-  <script>
-    const data = {
-      personality: ["你更喜欢独处还是社交？", "你做决定靠逻辑还是感觉？"],
-      career: ["你喜欢团队合作吗？", "你更看重薪资还是成长？"]
-    };
+    <header>
+        <h1>探索未知的深层自我</h1>
+        <p>选择一个评测维度，开启科学精准的专业人格微调与分析报告。</p>
+    </header>
 
-    let currentQuestions = [];
-    let index = 0;
+    <div class="waterfall-container">
 
-    function loadScript() {
-      const type = document.getElementById("scriptSelect").value;
-      currentQuestions = data[type];
-      index = 0;
-      showQuestion();
-    }
+        <div class="script-card">
+            <img class="script-image" src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80" alt="大五人格">
+            <div class="script-content">
+                <span class="script-tag">深度剖析</span>
+                <h3 class="script-title">现代大五人格 (Big Five) 全维评测</h3>
+                <p class="script-intro">基于当代心理学基石理论，从外向性、顺应性、尽责性、神经质及开放性五大核心维度，精确勾勒你的精神骨架与底层社交潜能。适合对自我认知有极高要求的深度探索者。</p>
+                <div class="script-footer">
+                    <div class="price-tag">¥19.9 <span>/ 报告</span></div>
+                    <a href="#" class="start-btn">进入测试</a>
+                </div>
+            </div>
+        </div>
 
-    function showQuestion() {
-      if (index >= currentQuestions.length) {
-        document.getElementById("test").innerHTML = "<h3>测试完成！</h3>";
-        return;
-      }
-      document.getElementById("test").innerHTML =
-        "<h3>" + currentQuestions[index] + "</h3>" +
-        "<button onclick='next()'>下一题</button>";
-    }
+        <div class="script-card">
+            <img class="script-image" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80" alt="职场评测">
+            <div class="script-content">
+                <span class="script-tag">生涯规划</span>
+                <h3 class="script-title">MBTI 职场进化表现与高阶矩阵</h3>
+                <p class="script-intro">专为职场精英打造。解析在多任务高压环境下，你的精力来源与决策模型如何发生隐性异变，定位你的隐藏领导力盲区。</p>
+                <div class="script-footer">
+                    <div class="price-tag">¥29.9 <span>/ 报告</span></div>
+                    <a href="#" class="start-btn">进入测试</a>
+                </div>
+            </div>
+        </div>
 
-    function next() {
-      index++;
-      showQuestion();
-    }
-  </script>
+        <div class="script-card">
+            <img class="script-image" src="https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?auto=format&fit=crop&w=600&q=80" alt="亲密关系">
+            <div class="script-content">
+                <span class="script-tag">情感动力学</span>
+                <h3 class="script-title">阿德勒亲密关系纽带与依恋评测</h3>
+                <p class="script-intro">揭示你在亲密关系中的安全感边界，探索童年“潜意识渴望”如何映射在当下的情感决策中。</p>
+                <div class="script-footer">
+                    <div class="price-tag">¥9.9 <span>/ 报告</span></div>
+                    <a href="#" class="start-btn">进入测试</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="script-card">
+            <img class="script-image" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80" alt="防御机制">
+            <div class="script-content">
+                <span class="script-tag">精神分析</span>
+                <h3 class="script-title">弗洛伊德式：本我与潜意识防御机制</h3>
+                <p class="script-intro">引入经典精神分析流派逻辑，深度探测个体面对焦虑、挫折与“原始冲突”时隐蔽启动的潜意识防御卡片。包含否认、压抑及合理化等12种防御面纱的穿透式剖析，提供极具分量的私密解读报告。</p>
+                <div class="script-footer">
+                    <div class="price-tag">¥39.9 <span>/ 报告</span></div>
+                    <a href="#" class="start-btn">进入测试</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </body>
 </html>
