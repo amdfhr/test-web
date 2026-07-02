@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>人格测试系统</title>
+</head>
+<body style="font-family: Arial; padding: 40px;">
+  <h1>🧠 人格测试系统</h1>
+  
+  <div id="setup">
+    <p>选择测试：</p>
+    <select id="scriptSelect">
+      <option value="personality">性格测试</option>
+      <option value="career">职业测试</option>
+    </select>
+    <button onclick="loadScript()">开始测试</button>
+  </div>
+
+  <div id="test" style="margin-top: 20px;"></div>
+
+  <script>
+    const data = {
+      personality: ["你更喜欢独处还是社交？", "你做决定靠逻辑还是感觉？"],
+      career: ["你喜欢团队合作吗？", "你更看重薪资还是成长？"]
+    };
+
+    let currentQuestions = [];
+    let index = 0;
+
+    function loadScript() {
+      const type = document.getElementById("scriptSelect").value;
+      currentQuestions = data[type];
+      index = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (index >= currentQuestions.length) {
+        document.getElementById("test").innerHTML = "<h3>测试完成！</h3>";
+        return;
+      }
+      document.getElementById("test").innerHTML =
+        "<h3>" + currentQuestions[index] + "</h3>" +
+        "<button onclick='next()'>下一题</button>";
+    }
+
+    function next() {
+      index++;
+      showQuestion();
+    }
+  </script>
+</body>
+</html>
