@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>人格测试网站</title>
+</head>
+<body style="font-family: Arial; padding: 40px;">
+  <h1>🧠 人格测试系统</h1>
+
+  <p>选择你的测试：</p>
+
+  <button onclick="startTest()">开始测试</button>
+
+  <div id="test"></div>
+
+  <script>
+    let index = 0;
+    const questions = [
+      "你更喜欢独处还是社交？",
+      "你做决定靠逻辑还是感觉？",
+      "你更计划还是随性？"
+    ];
+
+    function startTest() {
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (index >= questions.length) {
+        document.getElementById("test").innerHTML = "测试完成！";
+        return;
+      }
+
+      document.getElementById("test").innerHTML =
+        "<h3>" + questions[index] + "</h3>" +
+        "<button onclick='next()'>下一题</button>";
+    }
+
+    function next() {
+      index++;
+      showQuestion();
+    }
+  </script>
+</body>
+</html>
