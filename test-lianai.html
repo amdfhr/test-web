@@ -132,13 +132,14 @@
             <button class="matrix-btn" onclick="handleAnswer(1)">完全不符（+1分）</button>
         </div>
 
-         <div id="result-panel">
+        <div id="result-panel">
             <div style="font-size: 1.2rem; color: #718096; font-weight: 600;">你们的综合好感度指数</div>
             <div class="score-display" id="total-score-view">0%</div>
             
             <div style="text-align: center; margin: 15px 0;">
                 <img id="result-img" src="" alt="结果分析图" style="width: 100%; max-width: 250px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none;">
             </div>
+            
             <div class="dimension-box">
                 <h4 style="margin: 0 0 15px 0; color: #2d3748;">亲密关系五维雷达图数据</h4>
                 <div id="dim-zone"></div>
@@ -149,7 +150,8 @@
         </div>
     </div>
 
-    <script src="lianai-questions.js"></script>
+    <script src="questions.js"></script>
+    
     <script>
         let dimScores = { chire: 0, moqi: 0, yilian: 0, baorong: 0, xianshi: 0 };
         let currentStep = 0;
@@ -159,10 +161,10 @@
         const resultPanel = document.getElementById('result-panel');
         const errZone = document.getElementById('err-zone');
 
-        // 卡密算法校验
+        // 1. 卡密验证函数
         function verifyXianyuKey() {
             const inputVal = document.getElementById('secret-key-input').value.trim();
-            const isInputValid = /^520\d{7}$/.test(inputVal); // 必须以 520 开头，后面跟 7 位数字
+            const isInputValid = /^520\d{7}$/.test(inputVal); 
 
             if (isInputValid) {
                 keyOverlay.style.display = 'none';
@@ -173,29 +175,34 @@
             }
         }
 
-        // 加载外部 JS 数组中的题目
+        // 2. 动态加载外部题库题目
         function loadQuestion() {
             if (typeof loveQuizData !== 'undefined' && currentStep < loveQuizData.length) {
                 const currentData = loveQuizData[currentStep];
                 document.getElementById('q-box').innerText = currentData.q;
                 document.getElementById('progress-txt').innerText = `第 ${currentStep + 1} / ${loveQuizData.length} 题`;
                 document.getElementById('bar-fill').style.width = `${((currentStep + 1) / loveQuizData.length) * 100}%`;
+            } else {
+                document.getElementById('q-box').innerText = "❌ 题库加载失败，请检查 questions.js 文件是否存在。";
             }
         }
 
-        // 计分处理
+        // 3. 点击选项处理
         function handleAnswer(points) {
-            const currentData = loveQuizData[currentStep];
-            dimScores[currentData.type] += points;
-            currentStep++;
-            if (currentStep < loveQuizData.length) { 
-                loadQuestion(); 
-            } else { 
-                renderLoveResult(); 
+            if (typeof loveQuizData !== 'undefined' && currentStep < loveQuizData.length) {
+                const currentData = loveQuizData[currentStep];
+                dimScores[currentData.type] += points;
+                
+                currentStep++;
+                if (currentStep < loveQuizData.length) { 
+                    loadQuestion(); 
+                } else { 
+                    renderLoveResult(); 
+                }
             }
         }
 
-        // 渲染完整结局（已修复小于35不显示的问题）
+        // 4. 计算分数并输出图片、评语
         function renderLoveResult() {
             quizPanel.style.display = 'none';
             resultPanel.style.display = 'block';
@@ -205,6 +212,11 @@
             if(lovePercentage < 0) lovePercentage = 0;
 
             document.getElementById('total-score-view').innerText = lovePercentage + "%";
+            
+            // 获取图片容器
+            const resultImg = document.getElementById('result-img');
+            if (resultImg) resultImg.style.display = 'inline-block';
+
             const dimNames = { chire: "炽热指数 (激情)", moqi: "默契指数 (共鸣)", yilian: "依恋指数 (安全)", baorong: "包容指数 (磨合)", xianshi: "现实指数 (未来)" };
             const dimZone = document.getElementById('dim-zone');
             dimZone.innerHTML = '';
@@ -217,17 +229,21 @@
 
             let text = "";
             if (lovePercentage >= 85) {
-                text = "【好感度>85 宿命契合：灵魂共振的至臻爱恋】\n你们的亲密关系正处于极度健康的黄金期。不仅在多巴胺分泌（激情）上表现优异，更在未来的现实规划和底线包容上达成了惊人的共识。请毫无保留地走下去！";
+                text = "【宿命契合：灵魂共振的至臻爱恋】\n你们的亲密关系正处于极度健康的黄金期。不仅在多巴胺分泌上表现优异，更在未来的现实规划和底线包容上达成了惊人的共识。请毫无保留地走下去！";
+                if(resultImg) resultImg.src = "images/result-high.png";
             } else if (lovePercentage >= 60) {
-                text = "【好感度>60 双向奔赴：正在升温的舒适关系】\n你们对彼此有着极其明确的好感和依赖。在相处时充满了欢声笑语，但在涉及更长远的未来规划或者某些细小的缺点磨合上，依然留有共同探索的空间。";
+                text = "【双向奔赴：正在升温的舒适关系】\n你们对彼此有着极其明确的好感和依赖。在相处时充满了欢声笑语，但在涉及更长远的未来规划或者某些细小的缺点磨合上，依然留有共同探索的空间。";
+                if(resultImg) resultImg.src = "images/result-mid-high.png";
             } else if (lovePercentage >= 35) {
-                text = "【好感度>35 情感拉扯：迷雾中的羁绊磨合】\n你们之间存在着火花，但同时也伴随着较强的试探与不确定性。当前阶段需要更多的坦诚布公，而非内耗式的互相猜测。";
+                text = "【情感拉扯：迷雾中的羁绊磨合】\n你们之间存在着火花，但同时也伴随着较强的试探与不确定性。当前阶段需要更多的坦诚布公，而非内耗式的互相猜测。";
+                if(resultImg) resultImg.src = "images/result-mid-low.png";
             } else {
                 text = "【相望江湖：平行线的错位交织】\n测试结果显示，你们当前的情感交集相对疏离。或许你们更适合作为彼此生命中的旁观者、知己或普通朋友。不必因此沮丧，理智地认清彼此的底层需求差异，本身就是一种极具成熟度的情感智慧。";
+                if(resultImg) resultImg.src = "images/result-low.png";
             }
+            
             document.getElementById('analysis-zone').innerText = text;
         }
     </script>
 </body>
 </html>
-
