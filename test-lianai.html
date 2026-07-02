@@ -132,10 +132,13 @@
             <button class="matrix-btn" onclick="handleAnswer(1)">完全不符（+1分）</button>
         </div>
 
-        <div id="result-panel">
+         <div id="result-panel">
             <div style="font-size: 1.2rem; color: #718096; font-weight: 600;">你们的综合好感度指数</div>
             <div class="score-display" id="total-score-view">0%</div>
             
+            <div style="text-align: center; margin: 15px 0;">
+                <img id="result-img" src="" alt="结果分析图" style="width: 100%; max-width: 250px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none;">
+            </div>
             <div class="dimension-box">
                 <h4 style="margin: 0 0 15px 0; color: #2d3748;">亲密关系五维雷达图数据</h4>
                 <div id="dim-zone"></div>
@@ -220,7 +223,7 @@
             } else if (lovePercentage >= 35) {
                 text = "【好感度>35 情感拉扯：迷雾中的羁绊磨合】\n你们之间存在着火花，但同时也伴随着较强的试探与不确定性。当前阶段需要更多的坦诚布公，而非内耗式的互相猜测。";
             } else {
-                text = "【好感度<35 相望江湖：平行线的错位交织】\n测试结果显示，你们当前的情感交集相对疏离。或许你们更适合作为彼此生命中的旁观者、知己或普通朋友。不必因此沮丧，理智地认清彼此的底层需求差异，本身就是一种极具成熟度的情感智慧。";
+                text = "【相望江湖：平行线的错位交织】\n测试结果显示，你们当前的情感交集相对疏离。或许你们更适合作为彼此生命中的旁观者、知己或普通朋友。不必因此沮丧，理智地认清彼此的底层需求差异，本身就是一种极具成熟度的情感智慧。";
             }
             document.getElementById('analysis-zone').innerText = text;
         }
